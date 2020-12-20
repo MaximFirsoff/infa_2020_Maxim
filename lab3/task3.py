@@ -100,10 +100,39 @@ def green_man(xcord, ycord):
     ellipse(greenman, aliencolor, (49, 158, 13, 27))
     circle(greenman, aliencolor, (66, 181), 8)
 
+    screen.blit(greenman, (xcord, ycord))
 
+    # apple
+    gfxdraw.aacircle(greenman, 98, 98, 13, (200, 55, 55))
+    gfxdraw.filled_circle(greenman, 98, 98, 13, (200, 55, 55))
+    line(greenman, (134, 37, 37), (98, 88), (99, 88), 1)  # Line under branch
+    line(greenman, "black", (99, 87), (100, 85), 1)  # part of branch
+    line(greenman, "black", (100, 85), (110, 75), 2)  # branch
+    # leave
+    line(greenman, (136, 170, 0), (105, 80), (105, 78))
+    line(greenman, (136, 170, 0), (104, 79), (104, 76))
+    line(greenman, (136, 170, 0), (103, 78), (103, 74))
+    line(greenman, (136, 170, 0), (102, 77), (102, 73))
+    line(greenman, (136, 170, 0), (101, 76), (101, 72))
+    line(greenman, (136, 170, 0), (100, 74), (100, 71))
+    line(greenman, (136, 170, 0), (99, 72), (99, 70))
 
     screen.blit(greenman, (xcord, ycord))
 
+
+    """
+    apple = pygame.Surface((32, 45), pygame.SRCALPHA)
+    gfxdraw.aacircle(apple, 17, 30, 13, (200, 55, 55))
+    gfxdraw.filled_circle(apple, 17, 30, 13, (200, 55, 55))
+    line(apple, (134, 37, 37), (20, 18), (21, 19), 1)  # Line under branch
+    line(apple, "black", (22, 18), (23, 23), 1)  # part of branch
+    line(apple, "black", (23, 23), (35, 20), 2)  # branch
+    ellipse(apple, (136, 170, 0), (25, 8, 4, 15)) #leave
+    apple2 = pygame.transform.rotate(apple, 50)
+
+    screen.blit(apple2, (350, 412))
+
+    """
 
 FPS = 30
 screen = pygame.display.set_mode((450, 620))
