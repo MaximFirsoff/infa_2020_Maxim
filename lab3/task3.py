@@ -16,6 +16,7 @@ def clouds_draw(cloudscolor, cloudskoordinate):
     gfxdraw.aaellipse(screen, cloudskoordinate[0] + 225, cloudskoordinate[1] + 35, 225, 35, cloudscolor)
     gfxdraw.filled_ellipse(screen, cloudskoordinate[0] + 225, cloudskoordinate[1] + 35, 225, 35, cloudscolor)
 
+
 def spaseship(xcord, ycord):
     """
     drawing of spaceship
@@ -26,7 +27,7 @@ def spaseship(xcord, ycord):
     # Light of spaceship
     spaceship_light = pygame.Surface((190, 170), pygame.SRCALPHA)
     spaceship_light.set_alpha(128)
-    gfxdraw.aatrigon(spaceship_light, 0, 168, 184, 170, 95, -20, (255, 255, 255)) # Light from spaceship
+    gfxdraw.aatrigon(spaceship_light, 0, 168, 184, 170, 95, -20, (255, 255, 255))  # Light from spaceship
     gfxdraw.filled_trigon(spaceship_light, 0, 168, 184, 170, 95, -20, (255, 255, 255))
     screen.blit(spaceship_light, (xcord+5, ycord+60))
 
@@ -50,7 +51,7 @@ def green_man(xcord, ycord):
     :return:
     """
     greenman = pygame.Surface((115, 190), pygame.SRCALPHA)
-    aliencolor = (221, 233, 175) # color of alien
+    aliencolor = (221, 233, 175)  # color of alien
 
     # head
     circle(greenman, aliencolor, (20, 47), 5)
@@ -65,7 +66,7 @@ def green_man(xcord, ycord):
     circle(greenman, "white", (37, 58), 3)
     circle(greenman, "white", (60, 60), 2)
 
-    ellipse(greenman, aliencolor, (25, 87, 33, 67)) # body of alien
+    ellipse(greenman, aliencolor, (25, 87, 33, 67))  # body of alien
 
     # left cuticula
     circle(greenman, aliencolor, (8, 7), 7)
@@ -100,8 +101,6 @@ def green_man(xcord, ycord):
     ellipse(greenman, aliencolor, (49, 158, 13, 27))
     circle(greenman, aliencolor, (66, 181), 8)
 
-    screen.blit(greenman, (xcord, ycord))
-
     # apple
     gfxdraw.aacircle(greenman, 98, 98, 13, (200, 55, 55))
     gfxdraw.filled_circle(greenman, 98, 98, 13, (200, 55, 55))
@@ -119,20 +118,6 @@ def green_man(xcord, ycord):
 
     screen.blit(greenman, (xcord, ycord))
 
-
-    """
-    apple = pygame.Surface((32, 45), pygame.SRCALPHA)
-    gfxdraw.aacircle(apple, 17, 30, 13, (200, 55, 55))
-    gfxdraw.filled_circle(apple, 17, 30, 13, (200, 55, 55))
-    line(apple, (134, 37, 37), (20, 18), (21, 19), 1)  # Line under branch
-    line(apple, "black", (22, 18), (23, 23), 1)  # part of branch
-    line(apple, "black", (23, 23), (35, 20), 2)  # branch
-    ellipse(apple, (136, 170, 0), (25, 8, 4, 15)) #leave
-    apple2 = pygame.transform.rotate(apple, 50)
-
-    screen.blit(apple2, (350, 412))
-
-    """
 
 FPS = 30
 screen = pygame.display.set_mode((450, 620))
