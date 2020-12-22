@@ -17,11 +17,12 @@ def clouds_draw(cloudscolor, cloudskoordinate):
     gfxdraw.filled_ellipse(sky, cloudskoordinate[0] + 225, cloudskoordinate[1] + 35, 225, 35, cloudscolor)
 
 
-def spaseship(xcord, ycord):
+def spaseship(xcord, ycord, proc):
     """
     drawing of spaceship
     :param xcord: x of surface of left top corner
     :param ycord: y of surface of left top corner
+    :param proc: % of original spaceship
     :return: none
     """
     # Light of spaceship
@@ -29,7 +30,12 @@ def spaseship(xcord, ycord):
     spaceship_light.set_alpha(128)
     gfxdraw.aatrigon(spaceship_light, 0, 168, 184, 170, 95, -20, (255, 255, 255))  # Light from spaceship
     gfxdraw.filled_trigon(spaceship_light, 0, 168, 184, 170, 95, -20, (255, 255, 255))
-    screen.blit(spaceship_light, (xcord+5, ycord+60))
+
+    surf_size = spaceship_light.get_size()
+    scale_size = (int(surf_size[0] * proc/100), int(surf_size[1] * proc/100))
+    spaceship_light = pygame.transform.smoothscale(spaceship_light, scale_size)
+
+    screen.blit(spaceship_light, (xcord+5 * proc/100, ycord+60 * proc/100))
 
     # spaceship 5 200
     spaceship = pygame.Surface((200, 75), pygame.SRCALPHA)
@@ -40,14 +46,21 @@ def spaseship(xcord, ycord):
     y = (34, 50, 58, 34, 50, 58)
     for el in range(6):
         ellipse(spaceship, "white", (x[el], y[el], 25, 10))
+
+    surf_size = spaceship.get_size()
+    scale_size = (int(surf_size[0] * proc/100), int(surf_size[1] * proc/100))
+    spaceship = pygame.transform.smoothscale(spaceship, scale_size)
+
     screen.blit(spaceship, (xcord, ycord))
 
 
-def green_man(xcord, ycord):
+def green_man(xcord, ycord, proc, flip = 0):
     """
     Drawing Green Man from UFO
     :param xcord: x of surface of left top corner
     :param ycord: x of surface of left top corner
+    :param proc: % of original greenman
+    :param flip: 1 if it need to flin greenman
     :return:
     """
     greenman = pygame.Surface((115, 190), pygame.SRCALPHA)
@@ -116,6 +129,12 @@ def green_man(xcord, ycord):
     line(greenman, (136, 170, 0), (100, 74), (100, 71))
     line(greenman, (136, 170, 0), (99, 72), (99, 70))
 
+    surf_size = greenman.get_size()
+    scale_size = (int(surf_size[0] * proc/100), int(surf_size[1] * proc/100))
+    greenman = pygame.transform.smoothscale(greenman, scale_size)
+
+    greenman = pygame.transform.flip(greenman, flip, 0)
+
     screen.blit(greenman, (xcord, ycord))
 
 
@@ -148,15 +167,15 @@ sky = pygame.transform.smoothscale(sky, surf_size)
 
 screen.blit(sky, (0, 0))
 
-green_man(270, 345)
-green_man(105, 345)
-green_man(155, 370)
-green_man(35, 385)
-green_man(105, 460)
+green_man(270, 345, 100)
+green_man(105, 345, 30, 1)
+green_man(155, 370, 40)
+green_man(35, 385, 30, 1)
+green_man(105, 460, 50, 1)
 
-spaseship(5, 200)
-spaseship(175, 285)
-spaseship(320, 220)
+spaseship(5, 200, 100)
+spaseship(175, 285, 20)
+spaseship(320, 220, 50)
 
 pygame.display.update()
 clock = pygame.time.Clock()
