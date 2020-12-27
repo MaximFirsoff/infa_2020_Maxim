@@ -1,10 +1,23 @@
-import pygame
-from pygame.draw import *
-from random import randint
+try:
+    import pygame
+    from pygame.draw import *
+except ImportError:
+    print("This program requires pygame!")
+    print("Please press Win+R enter 'pip install pygame' and install it")
+    print("before running this program.")
+    exit(1)
+
+try:
+    from random import randint
+except ImportError:
+    print("This program requires pygame.draw!")
+    print("Please press Win+R enter 'pip install random' and install it")
+    print("before running this program.")
+    exit(1)
 
 pygame.init()
 
-FPS = 2
+FPS = 30
 ballsnumber = 5  # number of balls
 
 # get screen dimensions
@@ -16,17 +29,13 @@ ycoord = screenInfo.current_h - 100
 
 py = [1] * ballsnumber  # delta for x moving
 px = [1] * ballsnumber  # delta for y moving
+newball = [1] * ballsnumber  # list of surfaces what contain our balls and images
 
-# angel of fly`s ball
-for n in range(ballsnumber):
-    px[n] = randint(-10, 10)
-    py[n] = randint(-10, 10)
-
-screen = pygame.display.set_mode((xcoord, ycoord))
+screen = pygame.display.set_mode((xcoord, ycoord))  # main screen
 
 score = 0  # Score
 
-COLORS = [(255, 0, 0), (0, 0, 255), (255, 255, 0), (0, 255, 0), (255, 0, 255), (0, 255, 255)]
+COLORS = ["RED", "BLUE", "YELLOW", "GREEN", "MAGENTA", "CYAN"]  # colors of balls
 
 r = [0] * ballsnumber  # radius for each ball
 x = [0] * ballsnumber  # x for each ball
@@ -34,71 +43,136 @@ y = [0] * ballsnumber  # y for each ball
 color = [0] * ballsnumber  # color for each ball
 
 
-def new_ball(cx):
-    """рисует новый шарик """
+def new_ball(cxindex):
+    """ draw a new ball """
     global x, y, r, color
-    r[cx] = randint(5, 50)
-    x[cx] = randint(r[cx], xcoord - r[cx])
-    y[cx] = randint(r[cx], ycoord - r[cx])
-    color[cx] = COLORS[randint(0, 5)]
-    circle(screen, color[cx], (x[cx], y[cx]), r[cx])
+    r[cxindex] = randint(5, 50)
+    x[cxindex] = randint(1, xcoord - r[cxindex]*2 + 3)
+    y[cxindex] = randint(1, ycoord - r[cxindex]*2 + 3)
+    color[cxindex] = COLORS[randint(0, 5)]
+    # angel of fly`s ball
+    px[cxindex] = randint(-10, 10)
+    py[cxindex] = randint(-10, 10)
+    if randint(1, 5) == 3  and score > 100:
+        r[cxindex] = 51
+        newball[cxindex] = pygame.image.load('trusy-emporio-armani-siniy-545498-1.bmp')
+        newball[cxindex] = pygame.transform.smoothscale(newball[cxindex], (r[cxindex]*2, r[cxindex]*2))
+    else:
+        newball[cxindex] = pygame.Surface((r[cxindex] * 2, r[cxindex] * 2), pygame.SRCALPHA)  # container for ball
+        circle(newball[cxindex], color[cxindex], (r[cxindex], r[cxindex]), r[cxindex])
+    screen.blit(newball[cxindex], ((x[cxindex], y[cxindex])))
 
-
-def click(event):
+def click(ourevent):
+    """
+    in case pressing mouse button
+    """
     global score
-    for cx in range(ballsnumber):
-        if abs(x[cx] - event.pos[0]) < r[cx] and abs(y[cx] - event.pos[1]) < r[cx]:
-
-            score += int(1 / r[cx] * 100 * (x[cx] + y[cx]))
-            new_ball(cx)
+    for cxindex in range(ballsnumber):
+        if x[cxindex] <= ourevent.pos[0] <= x[cxindex]+r[cxindex]*2 and \
+            y[cxindex] <= ourevent.pos[1] <= y[cxindex]+r[cxindex]*2:
+            score += int(1 / r[cxindex] * 100 + 1/(x[cxindex] + y[cxindex]) * 10 + 4)
+            if r[cxindex] == 51:
+                r[cxindex] = 50
+                newball[cxindex] = pygame.image.load('trusy2.bmp')
+                newball[cxindex] = pygame.transform.smoothscale(newball[cxindex], (r[cxindex] * 2, r[cxindex] * 2))
+            else:
+                new_ball(cxindex)
         else:
-            score -= 410
+            score -= 1
 
 
-
-def filescore(score):
+def filescore(ourgamername, score):
+    """
+    reading file of score and writing new
+    """
     fileline = []
+    try:  # check file excist
+        open('ballscore.txt')
+    except IOError:
+        open('ballscore.txt', "w")
     with open('ballscore.txt') as file:
-        for line in file:
-            fileline.append(line.split(" "))
-        fileline.append([score, 'YOU,\n'])
-        fileline.sort(key=lambda x: int(x[0]))
-
+        for lineinfile in file:
+            if lineinfile != "\n":
+                fileline.append(lineinfile.split("----->"))
+        fileline.append([score, ourgamername + "\n"])
+        fileline.sort(reverse=True, key=lambda x: int(x[0]))
     filescore = open('ballscore.txt', "w")
-    print(fileline, file = filescore)
+    for i in fileline:
+        filescore.write(
+            str(i[0]) + "----->" + str(i[1])[:-1] + "\n")  # '-1' need for delete "\n" what excist in the end of a line
+
     filescore.close()
+
+
+def scoredisplayed(score):
+    """
+    displaying the score
+    """
+    f1 = pygame.font.Font(None, 36)
+    text1 = f1.render("Score: " + str(score), True, (180, 120, 120))
+    screen.blit(text1, (10, 50))
+
+
+def gamername(gamername=""):
+    """
+    To get name of gamer
+    """
+    blockname = pygame.Surface((480, 360))  # questioning of name
+    blockwelcome = pygame.Surface((480, 360))  # writing of name
+
+    font = pygame.font.Font(None, 50)
+    while True:
+        for evt in pygame.event.get():
+            if evt.type == pygame.KEYDOWN:
+                if evt.unicode.isalpha() and len(gamername) < 20:
+                    gamername += evt.unicode
+                elif evt.key == pygame.K_BACKSPACE:
+                    gamername = gamername[:-1]
+                elif evt.key == pygame.K_RETURN:
+                    return gamername
+            elif evt.type == pygame.QUIT:
+                return gamername
+        screen.fill((0, 0, 0))
+        blockwelcome = font.render("Enter Your name", True, (255, 255, 255))
+        blockname = font.render(gamername, True, (255, 255, 255))
+        rect = screen.get_rect().center
+        screen.blit(blockwelcome, (rect[0]/2 + 100, rect[1] - rect[1]/2))
+        screen.blit(blockname, (rect[0]- len(gamername) * 10, rect[1]))
+        pygame.display.flip()
 
 
 clock = pygame.time.Clock()
 finished = False
 
+gamername = gamername()
+
 # generating of balls
 for cx in range(ballsnumber):
     new_ball(cx)
 
+# main circle
 while not finished:
-    clock.tick(FPS + 30)
+    clock.tick(FPS)
+
+    # if something pressed
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            filescore(score)
+            filescore(gamername, score)
             finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
             click(event)
 
     for cx in range(ballsnumber):
-        circle(screen, color[cx], (x[cx], y[cx]), r[cx])
+ #       circle(newball[cx], color[cx], (r[cx], r[cx]), r[cx])
         x[cx] += px[cx]
         y[cx] += py[cx]
-        if abs(x[cx]) - r[cx] < 0 or x[cx] + r[cx] > xcoord:  # if our ball is near the wall
+        if x[cx] <= 0 or x[cx] + r[cx]*2 >= xcoord:  # if our ball is near the wall
             px[cx] *= -1
-        if abs(y[cx]) - r[cx] < 0 or y[cx] + r[cx] > ycoord:  # if our ball is near the wall
+        if y[cx] <= 0 or y[cx] + r[cx]*2 >= ycoord:  # if our ball is near the wall
             py[cx] *= -1
+        screen.blit(newball[cx], ((x[cx], y[cx])))
 
-    # for Score displayed
-    f1 = pygame.font.Font(None, 36)
-    text1 = f1.render("Score: " + str(score), True, (180, 120, 120))
-    screen.blit(text1, (10, 50))
-
+    scoredisplayed(score)
     pygame.display.update()
     screen.fill("BLACK")
 

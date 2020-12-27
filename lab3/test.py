@@ -1,15 +1,29 @@
-from operator import itemgetter
+import pygame
+from pygame.locals import *
 
-def myFunc(e):
-  return e[1]
+def name():
+    pygame.init()
+    screen = pygame.display.set_mode((480, 360))
+    name = ""
+    font = pygame.font.Font(None, 50)
+    while True:
+        for evt in pygame.event.get():
+            if evt.type == KEYDOWN:
+                if evt.unicode.isalpha():
+                    name += evt.unicode
+                elif evt.key == K_BACKSPACE:
+                    name = name[:-1]
+                elif evt.key == K_RETURN:
+                    name = ""
+            elif evt.type == QUIT:
+                return(name)
+        screen.fill((0, 0, 0))
+        block = font.render(name, True, (255, 255, 255))
+        rect = block.get_rect()
+        rect.center = screen.get_rect().center
+        screen.blit(block, rect)
+        pygame.display.flip()
 
-cars = [
-    ('score', 2005),
-    ('score', 2000),
-    ('score', 2019),
-    ('score', 2011)
-]
-
-cars.sort(key=lambda x:x[1])
-
-print(cars)
+if __name__ == "__main__":
+    name()
+    pygame.quit()
