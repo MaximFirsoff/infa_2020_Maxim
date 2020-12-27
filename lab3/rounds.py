@@ -1,4 +1,4 @@
-try:
+try:  # control exist of pygame module
     import pygame
     from pygame.draw import *
 except ImportError:
@@ -7,13 +7,30 @@ except ImportError:
     print("before running this program.")
     exit(1)
 
-try:
+try:  # control exist of random module
     from random import randint
 except ImportError:
-    print("This program requires pygame.draw!")
+    print("This program requires random")
     print("Please press Win+R enter 'pip install random' and install it")
     print("before running this program.")
     exit(1)
+
+try:  # control exist of urllib module
+    import urllib.request
+except ImportError:
+    print("This program requires urllib")
+    print("Please press Win+R enter 'pip install urllib' and install it")
+    print("before running this program.")
+    exit(1)
+
+try:  # check file if no images
+    f = open('trusy2.bmp')
+    f.close()
+    f = open('trusy-emporio-armani-siniy-545498-1.bmp')
+    f.close()
+except IOError:
+    urllib.request.urlretrieve("https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/lab3/trusy-emporio-armani-siniy-545498-1.bmp", "trusy-emporio-armani-siniy-545498-1.bmp")
+    urllib.request.urlretrieve("https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/lab3/trusy2.bmp", "trusy2.bmp")
 
 pygame.init()
 
@@ -47,14 +64,17 @@ def new_ball(cxindex):
     """ draw a new ball """
     global x, y, r, color
     r[cxindex] = randint(5, 50)
-    x[cxindex] = randint(1, xcoord - r[cxindex]*2 + 3)
-    y[cxindex] = randint(1, ycoord - r[cxindex]*2 + 3)
+    x[cxindex] = randint(1, xcoord - r[cxindex]*2)
+    y[cxindex] = randint(1, ycoord - r[cxindex]*2)
     color[cxindex] = COLORS[randint(0, 5)]
     # angel of fly`s ball
     px[cxindex] = randint(-10, 10)
     py[cxindex] = randint(-10, 10)
+
     if randint(1, 5) == 3  and score > 100:
         r[cxindex] = 51
+        x[cxindex] = randint(1, xcoord - r[cxindex] * 3)
+        y[cxindex] = randint(1, ycoord - r[cxindex] * 3)
         newball[cxindex] = pygame.image.load('trusy-emporio-armani-siniy-545498-1.bmp')
         newball[cxindex] = pygame.transform.smoothscale(newball[cxindex], (r[cxindex]*2, r[cxindex]*2))
     else:
