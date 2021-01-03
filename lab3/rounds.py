@@ -16,10 +16,10 @@ except ImportError:
     exit(1)
 
 try:  # control exist of urllib module
-    import urllib.request
+    import requests
 except ImportError:
-    print("This program requires urllib")
-    print("Please press Win+R enter 'pip install urllib' and install it")
+    print("This program requires requests")
+    print("Please press Win+R enter 'pip install requests' and install it")
     print("before running this program.")
     exit(1)
 
@@ -29,8 +29,14 @@ try:  # check file if no images
     f = open('trusy-emporio-armani-siniy-545498-1.bmp')
     f.close()
 except IOError:
-    urllib.request.urlretrieve("https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/lab3/trusy-emporio-armani-siniy-545498-1.bmp", "trusy-emporio-armani-siniy-545498-1.bmp")
-    urllib.request.urlretrieve("https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/lab3/trusy2.bmp", "trusy2.bmp")
+	r = requests.get('https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/lab3/trusy-emporio-armani-siniy-545498-1.bmp')
+	with open('trusy-emporio-armani-siniy-545498-1.bmp','wb') as f:
+  		f.write(r.content)
+	r = requests.get('https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/lab3/trusy2.bmp')
+	with open('trusy2.bmp','wb') as f:
+  		f.write(r.content)
+#    urllib.request.urlretrieve("https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/lab3/trusy-emporio-armani-siniy-545498-1.bmp", "trusy-emporio-armani-siniy-545498-1.bmp")
+#    urllib.request.urlretrieve("https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/lab3/trusy2.bmp", "trusy2.bmp")
 
 pygame.init()
 
@@ -82,15 +88,15 @@ def new_ball(cxindex):
         circle(newball[cxindex], color[cxindex], (r[cxindex], r[cxindex]), r[cxindex])
     screen.blit(newball[cxindex], ((x[cxindex], y[cxindex])))
 
-def click(ourevent):
+def click(ourevent, score):
     """
     in case pressing mouse button
     """
-    global score
     for cxindex in range(ballsnumber):
         if x[cxindex] <= ourevent.pos[0] <= x[cxindex]+r[cxindex]*2 and \
             y[cxindex] <= ourevent.pos[1] <= y[cxindex]+r[cxindex]*2:
-            score += int(1 / r[cxindex] * 100 + 1/(x[cxindex] + y[cxindex]) * 10 + 4)
+            score += 100/r[cxindex] + 100/(x[cxindex] + y[cxindex]) + 4
+            score = int(score) #  for linux
             if r[cxindex] == 51:
                 r[cxindex] = 50
                 newball[cxindex] = pygame.image.load('trusy2.bmp')
@@ -99,6 +105,7 @@ def click(ourevent):
                 new_ball(cxindex)
         else:
             score -= 1
+    return(score)
 
 
 def filescore(ourgamername, score):
@@ -180,7 +187,7 @@ while not finished:
             filescore(gamername, score)
             finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            click(event)
+            score = click(event, score)
 
     for cx in range(ballsnumber):
  #       circle(newball[cx], color[cx], (r[cx], r[cx]), r[cx])
