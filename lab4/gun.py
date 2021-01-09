@@ -89,7 +89,11 @@ class gun():
         self.f2_power = 10
         self.f2_on = 0
         self.an = 1
-        self.id = canv.create_line(20,450,50,420,width=7) # FIXME: don't know how to set it...
+        self.x = 40
+        self.y = 540
+        self.id = canv.create_line(self.x, self.y, self.x+30, self.y-30, width=7, tag="tank")
+    #       self.id = canv.create_line(20,450,50,420,width=7, tag="tank") # FIXME: don't know how to set it...
+
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -118,17 +122,22 @@ class gun():
         """Прицеливание. Зависит от положения мыши."""
         if event:
             try:
-                self.an = math.atan((event.y-450) / (event.x-20))
+#                self.an = math.atan((event.y-450) / (event.x-20))
+                self.an = math.atan((event.y-self.y) / (event.x-self.x))
             except ZeroDivisionError:
                 self.an = math.atan((event.y - 450) / (event.x - 19))
         if self.f2_on:
             canv.itemconfig(self.id, fill='orange')
         else:
             canv.itemconfig(self.id, fill='black')
-        canv.coords(self.id, 20, 450,
-                    20 + max(self.f2_power, 20) * math.cos(self.an),
-                    450 + max(self.f2_power, 20) * math.sin(self.an)
+        canv.coords(self.id, self.x, self.y,
+                    self.x + max(self.f2_power, 20) * math.cos(self.an),
+                    self.y + max(self.f2_power, 20) * math.sin(self.an)
                     )
+        # canv.coords(self.id, 20, 450,
+        #             20 + max(self.f2_power, 20) * math.cos(self.an),
+        #             450 + max(self.f2_power, 20) * math.sin(self.an)
+        #             )
 
 
     def power_up(self):
@@ -154,11 +163,40 @@ class target():
     def new_target(self):
         self.id = canv.create_oval(0, 0, 0, 0)
         r = self.r = rnd(5, 50)
-        x = self.x = rnd(r, 780)
+        self.x2 = self.x = rnd(r, 780)
         y = self.y = rnd(r, 550)
         color = self.color = 'red'
-        canv.coords(self.id, x-r, y-r, x+r, y+r)
-        canv.itemconfig(self.id, fill=color)
+        if choice([True, False]):
+            self.new_target_type1()
+        else:
+            self.new_target_type2()
+
+    def new_target_type1(self):
+        canv.coords(self.id, self.x-self.r, self.y-self.r, self.x2+self.r, self.y+self.r)
+        canv.itemconfig(self.id, fill=self.color)
+
+    def new_target_type2(self):
+        self.r2 = self.r+50
+        self.y = rnd(self.r2, 550)
+        self.vy = 0
+        canv.coords(self.id, self.x-self.r2, self.y-self.r, self.x+self.r2, self.y+self.r)
+        canv.itemconfig(self.id, fill=self.color)
+        self.r = self.r+50
+
+    def double_of_target(self):
+        """
+        return four target if two of targets is connecting
+        @return:
+        """
+        pass
+
+    def targets_bomb(self):
+        """
+        Bobing a gun
+        @return:
+        """
+        pass
+
 
     def hit(self, points):
         """Попадание шарика в цель."""
@@ -176,14 +214,14 @@ class target():
             self.vx = -self.vx
         if 600 < self.y + self.r or self.y - self.r < 0:  # if out of screen by y
             self.vy = -self.vy
-        canv.coords(
-                self.id,
-                self.x - self.r,
-                self.y - self.r,
-                self.x + self.r,
-                self.y + self.r
-        )
-
+        # canv.coords(
+        #         self.id,
+        #         self.x - self.r,
+        #         self.y - self.r,
+        #         self.x + self.r,
+        #         self.y + self.r
+        # )
+        canv.move(self.id, self.vx, self.vy)
 
 t1 = target()
 screen1 = canv.create_text(400, 300, text='', font='28')
