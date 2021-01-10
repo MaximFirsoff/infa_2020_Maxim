@@ -88,11 +88,23 @@ class gun():
     def __init__(self):
         self.f2_power = 10
         self.f2_on = 0
-        self.an = 1
+        self.an = -1.55  # angel of gun
         self.x = 40
         self.y = 540
-        self.id = canv.create_line(self.x, self.y, self.x+30, self.y-30, width=7, tag="tank")
+        self.new_gun()
     #       self.id = canv.create_line(20,450,50,420,width=7, tag="tank") # FIXME: don't know how to set it...
+
+    def new_gun(self):
+        """
+        draw new tank
+        @return:
+        """
+        self.id = canv.create_line(self.x, self.y, self.x+30, self.y-10, width=7, tag="tank")
+        canv.create_line(self.x-50, self.y+30, self.x + 50, self.y+30, width=30, tag="tank", fill = "orange")  # body of tank
+        canv.create_arc(self.x-20, self.y-2, self.x + 20, self.y+50, start=180, extent=-180, tag="tank", fill = "green")  # tower of tank
+        canv.create_oval(self.x-35, self.y+40, self.x-5, self.y+60, tag="tank", fill = "black")  # track of tank
+        canv.create_oval(self.x+5, self.y+40, self.x+35, self.y+60, tag="tank", fill = "black")  # another track of tank
+        self.tank = canv.gettags("tank")  #  lebel of tank for destroying
 
 
     def fire2_start(self, event):
@@ -108,7 +120,7 @@ class gun():
         bullet += 1
         vx = self.f2_power * math.cos(self.an)
         vy = self.f2_power * math.sin(self.an)
-        new_ball = ball(vx + 20, vy + 450)
+        new_ball = ball(vx + self.x, vy + self.y)
         new_ball.r += 5
         self.an = math.atan((event.y-new_ball.y) / (event.x-new_ball.x))
         new_ball.vx = vx
@@ -121,11 +133,16 @@ class gun():
     def targetting(self, event=0):
         """Прицеливание. Зависит от положения мыши."""
         if event:
-            try:
-#                self.an = math.atan((event.y-450) / (event.x-20))
-                self.an = math.atan((event.y-self.y) / (event.x-self.x))
-            except ZeroDivisionError:
-                self.an = math.atan((event.y - 450) / (event.x - 19))
+            if event.y < self.y:  # for NOT moving the gun down the tank
+                mouse_y = event.y - self.y
+            else:
+                mouse_y = 0
+            if event.x - self.x < 0:  # for right part of targeting
+                self.an = math.pi + math.atan(mouse_y/ (event.x - self.x))
+            elif event.x - self.x > 0:  # for left part of targeting (adding PI 3.14..)
+                self.an = math.atan(mouse_y / (event.x - self.x))
+            else:  # for 0 (divide zero error)
+                self.an = math.pi + math.atan(mouse_y/ (event.x - self.x-1))
         if self.f2_on:
             canv.itemconfig(self.id, fill='orange')
         else:
@@ -134,11 +151,20 @@ class gun():
                     self.x + max(self.f2_power, 20) * math.cos(self.an),
                     self.y + max(self.f2_power, 20) * math.sin(self.an)
                     )
-        # canv.coords(self.id, 20, 450,
-        #             20 + max(self.f2_power, 20) * math.cos(self.an),
-        #             450 + max(self.f2_power, 20) * math.sin(self.an)
-        #             )
 
+
+    def move_of_tank(self, event=0):
+        """
+        moving of gun
+        @param event: keys by moving
+        @return:
+        """
+        if event.keysym == "d" and self.x < 760:  # if press 'd' and not a border
+            canv.move("tank", 1, 0)  # move the target right
+        elif event.keysym == "a" and self.x > 40: # if press 'a' and not a border
+            canv.move("tank", -1, 0)  # move the target left
+        listtankcoord = canv.coords(self.id)  # get the coordinates of tank
+        self.x, self.y = listtankcoord[:2]  # new x and y after moving
 
     def power_up(self):
         if self.f2_on:
@@ -152,9 +178,9 @@ class gun():
 class target():
     def __init__(self):
         self.live = 1
-        # FIXME: fixed don't work!!! How to call this functions when object is created?
-        canv.create_oval(0, 0, 50, 50, outline="white", fill="white")
-        id_points = canv.create_text(30,30,text = "0",font = '28')
+        # FIXME: - fixed fixed don't work!!! How to call this functions when object is created?
+#        canv.create_oval(0, 0, 50, 50, outline="white", fill="white") # clear old points. TODO - change the method
+#        self.id_points = canv.create_text(30,30,text = "0",font = '28')
  #       self.id = id
         self.vx = 1
         self.vy = 1
@@ -163,28 +189,38 @@ class target():
     def new_target(self):
         self.id = canv.create_oval(0, 0, 0, 0)
         r = self.r = rnd(5, 50)
-        self.x2 = self.x = rnd(r, 780)
-        y = self.y = rnd(r, 550)
+        self.x2 = self.x = rnd(r, 799-r)
+        y = self.y = rnd(r, 599-r)
         color = self.color = 'red'
-        if choice([True, False]):
+        self.creatingtime = time.time()  # time creating of target
+        if choice([True, False]):  # random choosing target`s type
             self.new_target_type1()
         else:
             self.new_target_type2()
 
     def new_target_type1(self):
+        """
+        First type of targets
+        @return:
+        """
         canv.coords(self.id, self.x-self.r, self.y-self.r, self.x2+self.r, self.y+self.r)
         canv.itemconfig(self.id, fill=self.color)
 
     def new_target_type2(self):
-        self.r2 = self.r+50
-        self.y = rnd(self.r2, 550)
-        self.vy = 0
+        """
+        Targets - type2
+        @return:
+        """
+        self.r2 = self.r + 50  # oval - new shape of targets
+        self.x = rnd(self.r2, 799-self.r2)  # else part of target will be out of screen
+        self.vy = 0  # this is moving by x-coordinate
         canv.coords(self.id, self.x-self.r2, self.y-self.r, self.x+self.r2, self.y+self.r)
         canv.itemconfig(self.id, fill=self.color)
-        self.r = self.r+50
+        self.r = self.r2  # for check touch with borders
 
     def double_of_target(self):
         """
+        TODO
         return four target if two of targets is connecting
         @return:
         """
@@ -192,15 +228,19 @@ class target():
 
     def targets_bomb(self):
         """
-        Bobing a gun
+        TODO
+        Bombing a gun
         @return:
         """
-        pass
+#       print(time.time() - self.creatingtime )
+        self.creatingtime += 0.1  # for only one bomb
 
 
     def hit(self, points):
         """Попадание шарика в цель."""
-        canv.create_oval(0, 0, 50, 50, outline = "white", fill = "white")
+#        canv.create_oval(0, 0, 50, 50, outline = "white", fill = "white")  # clear old points. TODO - change the method
+        id_points = canv.create_text(30, 30, text=points-1, font='28', fill = "white")
+        canv.itemconfig(id_points, fill = "white")
         canv.create_text(30, 30, text=points, font='28')
         self.new_target = None
         canv.delete(self.id)
@@ -214,59 +254,54 @@ class target():
             self.vx = -self.vx
         if 600 < self.y + self.r or self.y - self.r < 0:  # if out of screen by y
             self.vy = -self.vy
-        # canv.coords(
-        #         self.id,
-        #         self.x - self.r,
-        #         self.y - self.r,
-        #         self.x + self.r,
-        #         self.y + self.r
-        # )
-        canv.move(self.id, self.vx, self.vy)
+        canv.move(self.id, self.vx, self.vy)  # move the target
+ #       print(round(time.time() - self.creatingtime) )
+        if (round(time.time() - self.creatingtime)) % 3 == 0 and self.vy == 0:  # if targets`s typ is 2 and 3sec is went out
+            self.targets_bomb()
 
 t1 = target()
 screen1 = canv.create_text(400, 300, text='', font='28')
 
 bullet = 0
 balls = []
-targets = []
-
+points = 1
+canv.create_text(30, 30, text=points-1, font='28')
 
 def new_game(event=''):
-    global gun, t1, screen1, balls, bullet
+    global gun, t1, screen1, balls, bullet, points
 #    t1.new_target()
-    points = 1
+
     g1 = gun()
-    targets = []
+    targets = [] # list of targetx
     bullet = 0
     balls = []
     targets_number = 3  #  how many targets needs
+    canv.bind_all('<KeyPress>', g1.move_of_tank) # meFIXME
     canv.bind('<Button-1>', g1.fire2_start)
     canv.bind('<ButtonRelease-1>', g1.fire2_end)
     canv.bind('<Motion>', g1.targetting)
 
+
     z = 0.03
 
-    for i in range(targets_number):
+    for i in range(targets_number):  # in this cicle we get all our targets
         news_target = target()
         targets += [news_target]
-        id = canv.create_oval(0, 0, 0, 0)  # picture of our target
-        #news_target.new_target(canv.create_oval(0, 0, 0, 0))
         news_target.new_target()
 
     while targets_number > 0:
-        for t1 in targets:
+        for t1 in targets:  # moving of targets
             t1.targetmove()
         for b in balls:
             b.move()
-            for t1 in targets:
-#               t1.targetmove()
+            for t1 in targets:  # if some of the targets is hits
                 if b.hittest(t1) and t1.live:
                     t1.live = 0
                     t1.hit(points)
                     points += 1
-                    targets_number -= 1
-                    if targets_number == 0:
-                        for bdestroy in balls:
+                    targets_number -= 1  # one less target
+                    if targets_number == 0: # if all targets destroyed
+                        for bdestroy in balls:  # get all balls out of screen
                             canv.delete(bdestroy.id)
                         canv.bind('<Button-1>', '')
                         canv.bind('<ButtonRelease-1>', '')
@@ -279,11 +314,11 @@ def new_game(event=''):
         g1.targetting()
         g1.power_up()
     canv.itemconfig(screen1, text='')
-    canv.delete(g1.id)
+    canv.delete(g1.tank)
     root.after(750, new_game)
 
 
 new_game()
-canv.delete(all)
+canv.delete(all)  # clear all screen (canvas)
 
 tk.mainloop()
