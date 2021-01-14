@@ -1,14 +1,24 @@
-from tkinter import *
+import tkinter as tk
+
+def show(event, p, tag):
+    print(f"{p=}\n{tag=}")
 
 
-def event_info(event):
-    print(type(event))
-    print(event)
-    print(event.time)
-    print(event.x_root)
-    print(event.y_root)
+centers = [[50, 50], [90, 50]]
 
+root = tk.Tk()
+canvas = tk.Canvas()
+canvas.grid(row=0, column=0, sticky='news')
 
-root = Tk()
-root.bind('a', event_info)
+p1 = canvas.create_oval(20,10,30,20, fill='green',tags=('point_green_1', 'draw'))
+p2 = canvas.create_oval(50,10,60,20, fill='green',tags=('point_green_2', 'draw'))
+canvas.tag_bind(p1, '<Button-1>', lambda event: show(event, p1, ('point_green_1', 'draw')))
+canvas.tag_bind(p2, '<Button-1>', lambda event: show(event, p2, ('point_green_2', 'draw')))
+
+for idx, center in enumerate(centers):
+    tag= f'point_{idx}'
+    p=canvas.create_oval(center[0] - 5, center[1] - 5, center[0] + 5, center[1] + 5, fill='red',
+                         tags=(tag, 'draw'))
+    canvas.tag_bind(p, '<Button-1>', lambda event, p=p, tag=tag: show(event, p, tag))
+
 root.mainloop()

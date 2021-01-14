@@ -175,13 +175,71 @@ class gun():
             canv.itemconfig(self.id, fill='black')
 
 
+class bomb():
+    bombs = []
+    def targets_bomb(self):
+        """
+        TODO
+        Bombing a gun
+        self.x_bomb - x position of bomb
+        self.y_bomb - y position of bomb
+        @return:
+        """
+    #    print(time.time() - self.creatingtime )
+        t1.creatingtime += 5  # for only one bomb in 5 seconds
+        self.x_bomb = t1.x
+        self.y_bomb = t1.y
+        self.new_bomb()
+
+ #       self.bombs += [self.new_bomb()]
+
+
+    def new_bomb(self):
+        """
+        draw new bomb of target
+        @return:
+        """
+        self.id_bomb1 = canv.create_oval(self.x_bomb, self.y_bomb, self.x_bomb+10, self.y_bomb+27, \
+                         fill="black", tag="targetbomb")
+        self.id_bomb2 = canv.create_polygon((self.x_bomb-4, self.y_bomb-5), (self.x_bomb+5, self.y_bomb), \
+                            (self.x_bomb+12, self.y_bomb-5), (self.x_bomb+5, self.y_bomb+10), \
+                            fill="black", tag="targetbomb")
+        self.bombs.append(self.id_bomb1)
+
+
+    def bombmove(self):
+        """
+        moving bombs
+        @return:
+        """
+        canv.move("targetbomb", 0, 1)   # move the bomb
+#        self.y_bomb += 1
+#        print(self.y_bomb)
+#        print(bool(canv.coords("targetbomb")))
+ #       print(canv.coords(self.id_bomb1))
+        print (len(self.bombs))
+        for i in self.bombs:  # for all bombs
+            print (canv.coords(i)[1])
+
+            if canv.coords(i)[1] > 600:  # deleting if bomb out of screen
+                canv.delete(i)  # deleting bomb
+                self.bombs.remove(i)  # deleting element of list
+
+    def tankhit(self):
+        """
+        controls for tank hitting
+        @return:
+        """
+        print(canv.coords("tank"))
+        print(canv.coords("targetbomb"))
+
+
 class target():
     def __init__(self):
         self.live = 1
         # FIXME: - fixed fixed don't work!!! How to call this functions when object is created?
 #        canv.create_oval(0, 0, 50, 50, outline="white", fill="white") # clear old points. TODO - change the method
 #        self.id_points = canv.create_text(30,30,text = "0",font = '28')
- #       self.id = id
         self.vx = 1
         self.vy = 1
 
@@ -226,19 +284,17 @@ class target():
         """
         pass
 
-    def targets_bomb(self):
+
+    def destroybombs(self):
         """
-        TODO
-        Bombing a gun
+        deleting all objects of target
         @return:
         """
-#       print(time.time() - self.creatingtime )
-        self.creatingtime += 0.1  # for only one bomb
+        canv.delete("targetbomb")
 
 
     def hit(self, points):
         """Попадание шарика в цель."""
-#        canv.create_oval(0, 0, 50, 50, outline = "white", fill = "white")  # clear old points. TODO - change the method
         id_points = canv.create_text(30, 30, text=points-1, font='28', fill = "white")
         canv.itemconfig(id_points, fill = "white")
         canv.create_text(30, 30, text=points, font='28')
@@ -255,9 +311,11 @@ class target():
         if 600 < self.y + self.r or self.y - self.r < 0:  # if out of screen by y
             self.vy = -self.vy
         canv.move(self.id, self.vx, self.vy)  # move the target
- #       print(round(time.time() - self.creatingtime) )
-        if (round(time.time() - self.creatingtime)) % 3 == 0 and self.vy == 0:  # if targets`s typ is 2 and 3sec is went out
-            self.targets_bomb()
+        if self.new_target != None and (round(time.time() - self.creatingtime)) % 9 == 0 \
+                                   and self.vy == 0:  # if target exist and targets`s type is 2 and 3sec is went out
+            bomb().targets_bomb()
+
+
 
 t1 = target()
 screen1 = canv.create_text(400, 300, text='', font='28')
@@ -292,17 +350,20 @@ def new_game(event=''):
     while targets_number > 0:
         for t1 in targets:  # moving of targets
             t1.targetmove()
+            bomb().bombmove()
         for b in balls:
             b.move()
             for t1 in targets:  # if some of the targets is hits
                 if b.hittest(t1) and t1.live:
                     t1.live = 0
                     t1.hit(points)
+                    bomb().tankhit()
                     points += 1
                     targets_number -= 1  # one less target
                     if targets_number == 0: # if all targets destroyed
                         for bdestroy in balls:  # get all balls out of screen
                             canv.delete(bdestroy.id)
+                        t1.destroybombs()
                         canv.bind('<Button-1>', '')
                         canv.bind('<ButtonRelease-1>', '')
                         canv.itemconfig(screen1, text='Вы уничтожили цели за ' + str(bullet) + ' выстрелов')
