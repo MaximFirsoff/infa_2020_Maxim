@@ -183,7 +183,8 @@ class gun:
         elif event.keycode == 65 and self.x > 40:  # if press 'a' and not a border
             canv.move("tank", -1, 0)  # move the target left
         listtankcoord = canv.coords(self.id)  # get the coordinates of tank
-        self.x, self.y = listtankcoord[:2]  # new x and y after moving
+        if listtankcoord != []:  # if tank exist
+            self.x, self.y = listtankcoord[:2]  # new x and y after moving
 
     def power_up(self):
         if self.f2_on:
@@ -368,10 +369,11 @@ def new_game(event=''):
     bullet = 0
     targets_number = 3  # how many targets needs
     speedofbombsmoving = 5  # how speed bombs must drop
-    canv.bind_all('<KeyPress>', g1.presskey)  # meFIXME
+
     canv.bind('<Button-1>', g1.fire2_start)
     canv.bind('<ButtonRelease-1>', g1.fire2_end)
     canv.bind('<Motion>', g1.targetting)
+    canv.bind_all('<KeyPress>', g1.presskey)  # meFIXME
     z = 0.03
 
     for i in range(targets_number):  # in this circle we get all our targets
