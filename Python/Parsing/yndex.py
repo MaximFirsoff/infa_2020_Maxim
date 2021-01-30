@@ -18,6 +18,7 @@ bestprice = [7647, \
              895, \
              795]
 
+
 def mailsend():
       """
       sending e-mail
@@ -84,7 +85,7 @@ def yandex(soup):
       """
       ourprice = soup.find_all('span', {'data-tid': 'c3eaad93'})  # Получаем строку с ценой
       ourprice = str(ourprice).replace(' ', '')
- #     ourprice = ourprice.split()
+      # ourprice = ourprice.split()
       ourprice = str(ourprice).split('>')
       ourprice = str(ourprice[1]).split('<')
       ourprice = int(ourprice[0])
@@ -93,25 +94,33 @@ def yandex(soup):
 
 #mailsend()
 
-cj = browsercookie.firefox()  # get cookies from firefox
-req = requests.get(urllist[2], headers={'User-Agent': UserAgent().random}, cookies=cj)  #отправляем HTTP запрос подставляя фэйковый запрос
-req.encoding = 'utf8'  # определяем кодировку
-htmlString = req.text
-soup = BeautifulSoup(htmlString)  # Отправляем полученную страницу в библиотеку для парсинга
-#print(htmlString)
-#print(req)
-#print(req.content)
-#ourprice = str(ourprice).split(sep='\n')
-ourprice = ozon(soup)
+for i in range(len(urllist)):
 
-#print(cj)
+      cj = browsercookie.firefox()  # get cookies from firefox
+      req = requests.get(urllist[i], headers={'User-Agent': UserAgent().random}, cookies=cj)  #отправляем HTTP запрос подставляя фэйковый запрос
+      req.encoding = 'utf8'  # определяем кодировку
+      htmlString = req.text
+      soup = BeautifulSoup(htmlString)  # Отправляем полученную страницу в библиотеку для парсинга
+      #print(htmlString)
+      #print(req)
+      #print(req.content)
+      #ourprice = str(ourprice).split(sep='\n')
 
-print(ourprice)
+      if i == 0:
+            ourprice = yandex(soup)
+      elif i == 1:
+            ourprice = wildberries(soup)
+      elif i == 2:
+            ourprice = ozon(soup)
 
-# if ourprice < bestprice[0]:
-#       print('In ', urllist[0], ' \n is price decreasing \n was ', bestprice[0], '\n now ', ourprice)
+      #print(cj)
+
+      print(ourprice)
+
+      # if ourprice < bestprice[0]:
+      #       print('In ', urllist[0], ' \n is price decreasing \n was ', bestprice[0], '\n now ', ourprice)
 
 
-# в цикле получим ответ страницы как она нас видит
-# for key, value in req.request.headers.items():
-#     print(key+": "+value)
+      # в цикле получим ответ страницы как она нас видит
+      # for key, value in req.request.headers.items():
+      #     print(key+": "+value)
