@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
+import browsercookie
+# for e-mailing
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
@@ -78,24 +80,34 @@ def yandex(soup):
       return: price
       """
       ourprice = soup.find_all('span', {'data-tid': 'c3eaad93'})  # Получаем строку с ценой
-      #ourprice = str(ourprice).split()
-      # ourprice = str(ourprice[4]).split('>')
+      ourprice = str(ourprice).replace(' ', '')
+      ourprice = ourprice.split()
+#      ourprice = str(ourprice).split('>')
+#      ourprice = str(ourprice).split('<')
       # ourprice = int(ourprice[1])
       # return ourprice
       print(ourprice)
+      print(ourprice[0])
 
 
 #mailsend()
 
-req = requests.get(urllist[0], headers={'User-Agent': UserAgent().random})  #отправляем HTTP запрос подставляя фэйковый запрос от хром
+cj = browsercookie.firefox()
+
+
+req = requests.get(urllist[0], headers={'User-Agent': UserAgent().random}, cookies=cj)  #отправляем HTTP запрос подставляя фэйковый запрос
 req.encoding = 'utf8'  # определяем кодировку
 htmlString = req.text
 soup = BeautifulSoup(htmlString)  # Отправляем полученную страницу в библиотеку для парсинга
 #print(htmlString)
-#rint(req)
+#print(req)
 #print(req.content)
 #ourprice = str(ourprice).split(sep='\n')
 ourprice = yandex(soup)
+
+print(cj)
+
+
 print(ourprice)
 
 
