@@ -97,7 +97,7 @@ def yandex(soup):
 for i in range(0, len(dfexcel)):  # for each row in Excel file
     ourprice = 0
 
-    while ourprice == 0:  # if cookies old and function get error we signaling about it and cycle
+    while ourprice == 0:  # if cookies is old and function get error we signaling about it and cycle
         try:
             try:  # if Firefox exist
                 cj = browsercookie.firefox()  # get cookies from firefox
@@ -127,7 +127,7 @@ for i in range(0, len(dfexcel)):  # for each row in Excel file
         #     print(key+": "+value)
 
 
-        except IndexError:
+        except IndexError:  # if get bann
             print('The Site blocks Your cookies. You need open Firefox and go by link')
             print(dfexcel.iloc[i]['URL'])
             print('Enter the capcha')
