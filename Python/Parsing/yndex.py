@@ -7,16 +7,19 @@ from fake_useragent import UserAgent
 import browsercookie
 import pandas as pd
 import time
+import re
 
 # for e-mailing
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
 
-file = 'shops.xls'  # get file with data
-xl = pd.ExcelFile(file)  # make a DataFrame
-dfexcel = xl.parse('Лист1')  # parse Sheet1
-
+try:
+    file = 'shops.xls'  # get file with data
+    xl = pd.ExcelFile(file)  # make a DataFrame
+    dfexcel = xl.parse('Лист1')  # parse Sheet1
+except FileNotFoundError:  # if no the file
+    print("""there must be the file "shop.xls" somewhere""")
 
 def mailsend():
     """
@@ -60,8 +63,11 @@ def wildberries(soup):
       return: price
       """
     ourprice = soup.find('span', {'class': 'final-cost'})  # Получаем строку с ценой
+    ourprice = str(ourprice).replace(u'\xa0', '')  # getout non-breaking spaces
     ourprice = str(ourprice).split()  # split the string
-    ourprice = int(ourprice[2])  # get our price as number
+    ourprice = str(ourprice[2])[:-1]  # getting element without last symbol
+    ourprice = int(ourprice)  # get our price as number
+
     return ourprice
 
 
@@ -72,9 +78,11 @@ def ozon(soup):
       return: price
       """
     ourprice = soup.find_all('span', {'class': 'c8q7 c8q8'})  # Получаем строку с ценой
+    ourprice = str(ourprice).replace(u'\xa0', '')  # getout non-breaking spaces
     ourprice = str(ourprice).split()
     ourprice = str(ourprice[4]).split('>')
-    ourprice = int(ourprice[1])
+    ourprice = re.findall(r'\d+', str(ourprice[1]))  # getting number from string
+    ourprice = int(ourprice[0])
     return ourprice
 
 
@@ -134,4 +142,5 @@ for i in range(0, len(dfexcel)):  # for each row in Excel file
             wait = input("And press Enter to continue after that.")
 
             # print(cj)
+
 
