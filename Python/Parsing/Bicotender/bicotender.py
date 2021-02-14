@@ -10,12 +10,11 @@ import re
 from datetime import datetime
 from datetime import timedelta
 
-url = 'https://www.bicotender.ru/tender/search/?keywords=&region_id%5B%5D=4996&status_id%5B%5D=3&on_page=20&submit' \
-      '=найти '
 list_of_tenders = []  # to get all tenders on the page
 list_of_otrsl = [i for i in range(1, 24)]  # list of industrial branch
 list_of_tenders_type = [i for i in range(1, 21)]  # list of tender's type
 tender_days = 30  # period we need to get
+
 
 def getsoup(url):
     """
@@ -52,9 +51,11 @@ def tenderquantity():
     num_of_tenders = str(list_of_qu[0]).replace(u'\xa0', '')  # get out non-breaking spaces
     num_of_tenders = re.findall(r'\d+', num_of_tenders)  # getting number from string
     num_of_tenders = int(num_of_tenders[0])
-    if num_of_tenders > 20:
+    if num_of_tenders > 20 and check_tender_num != tender_days:
         print(url)
-        wait = input("in that url number of tenders is more then 20 press Enter to continue.")
+        wait = input("in that url number of tenders is more then 20 second time press Enter to continue.")
+        num_of_tenders = 0
+    return num_of_tenders
 
 
 def getnameoftender():
@@ -142,11 +143,24 @@ def gettupleline():
 resultFyle = open("output.csv", 'w')  # Open File
 resultFyle.write("Наименование;Тип тендера;Цена;До;Регион;Отрасль\n")  # Write first row to file
 
-for dais_count in range(tender_days, 0, -1):  # for each day in period
-    loaddate = (datetime.today() - timedelta(days=dais_count)).strftime('%d.%m.%Y')  # get string of load date
-    print("Идет поиск за ", loaddate)
-    for type_of_tender in range(1, len(list_of_tenders_type)):
-        for industial_otrasl in range(1, len(list_of_otrsl)):
+
+check_tender_num = tender_days  # for if there is more than 20 tenders on the page we will use everyday cycle
+for type_of_tender in range(1, len(list_of_tenders_type)):
+
+    for industial_otrasl in range(1, len(list_of_otrsl)):
+        dais_count = tender_days
+        while dais_count > check_tender_num-1:  # for each day in period
+ #       for dais_count in range(tender_days, check_tender_num-1, -1):  # for each day in period
+            loaddate = (datetime.today() - timedelta(days=dais_count-1)).strftime('%d.%m.%Y')  # get string of load date
+            print(dais_count)
+            print(check_tender_num)
+            print("industial_otrasl-", industial_otrasl)
+            if check_tender_num == tender_days and  dais_count == tender_days:
+                loaddate = ""
+            elif check_tender_num != tender_days and  dais_count == 1:
+                check_tender_num = tender_days
+                dais_count = tender_days
+            print("Идет поиск за ", loaddate)
             url = "https://www.bicotender.ru/tender/search/?keywords=&no_search_by_positions=0&no_search_by_positions=1" \
                   "&keywordsStrict=0&nokeywords=&no_exclude_by_positions=0&no_exclude_by_positions=1" \
                   "&documentationKeywords=&nodocumentationKeywords=&region_id%5B%5D=4996&field_id%5B%5D={" \
@@ -155,10 +169,16 @@ for dais_count in range(tender_days, 0, -1):  # for each day in period
                   "=&prepaymentPercent%5Bto%5D=&loadTime%5Bfrom%5D={}&loadTime%5Bto%5D={}&finishDate%5Bfrom%5D=&finishDate" \
                   "%5Bto%5D=&status_id%5B%5D=3&type_id%5B%5D={" \
                   "}&sourceUrl=&excludeSourceUrl=0&tender_id=&srcNoticeNumber=&show_expiration=0&show_expiration=on" \
-                  "&on_page=20&order=bcNewness+DESC&searchInFound=0&submit=Искать".format(industial_otrasl, loaddate, loaddate, type_of_tender)
+                  "&on_page=20&order=bcNewness+DESC&searchInFound=0&submit=Искать".format(industial_otrasl, loaddate,
+                                                                                          loaddate, type_of_tender)
             soup = getsoup(url)  # get http page
+            print(url)
+            num_of_tenders = tenderquantity()  # check quantity of tenders on the page
+            if num_of_tenders >20:  # if there is more than 20 tender on the page we go to everyday cycle
+                check_tender_num = 1
+ #               dais_count = 1
+                continue
 
-            tenderquantity()  # check quantity of tenders on the page
 
             list_of_data = soup.find_all('tr')  # get list of tenders
 
@@ -170,5 +190,6 @@ for dais_count in range(tender_days, 0, -1):  # for each day in period
                 for r in tupleline:
                     resultFyle.write(r + ";")  # in cycle write data to file
                 resultFyle.write(";\n")
+            dais_count -= 1
 
 resultFyle.close()  # close File
