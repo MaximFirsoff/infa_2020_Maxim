@@ -100,9 +100,11 @@ def getperiod():
     """
     period = str(tr_list_of_data).split('Период показа')
     period = str(period[1]).split('>')
-    period = re.findall(r'\d{2}.\d{2}.\d{4}', str(period[5]))  # getting date from string
-    period = " ".join(period)
-    return period
+    periodfrom = re.findall(r'\d{2}.\d{2}.\d{4}', str(period[4]))  # getting date from string
+    periodfrom = " ".join(periodfrom)
+    periodto = re.findall(r'\d{2}.\d{2}.\d{4}', str(period[5]))  # getting date from string
+    periodto = " ".join(periodto)
+    return periodfrom, periodto
 
 
 def getregion():
@@ -133,11 +135,11 @@ def gettupleline():
     name_of_tender = getnameoftender()
     type_of_tender = gettypeoftender()
     price_of_tender = getpriceoftender()
-    period = getperiod()
+    periodfrom, periodto = getperiod()
     region = getregion()
     branchname = getbranchname()
 
-    return (name_of_tender, type_of_tender, price_of_tender, period, region, branchname)
+    return (name_of_tender, price_of_tender, periodto, type_of_tender, periodfrom, region, branchname)
 
 
 resultFyle = open("output.csv", 'w')  # Open File
@@ -148,6 +150,7 @@ check_tender_num = tender_days  # for if there is more than 20 tenders on the pa
 for type_of_tender in range(1, len(list_of_tenders_type)):
 
     for industial_otrasl in range(1, len(list_of_otrsl)):
+
         dais_count = tender_days
         while dais_count > check_tender_num-1:  # for each day in period
  #       for dais_count in range(tender_days, check_tender_num-1, -1):  # for each day in period
