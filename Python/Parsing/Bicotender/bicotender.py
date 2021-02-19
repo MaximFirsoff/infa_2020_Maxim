@@ -11,9 +11,19 @@ from datetime import datetime
 from datetime import timedelta
 
 list_of_tenders = []  # to get all tenders on the page
-list_of_otrsl = [i for i in range(1, 24)]  # list of industrial branch
-list_of_tenders_type = [i for i in range(1, 21)]  # list of tender's type
+list_of_otrsl = [i for i in range(1, 25)]  # list of industrial branch
+list_of_tenders_type = [i for i in range(1, 22)]  # list of tender's type
 tender_days = 30  # period we need to get
+# dictionary of industrial subbranches
+dict_of_otrsl = {7: [1029, 1033, 1006, 1007, 1032, 1031, 1009, 1008, 1004, 1030],
+                1: [1001, 1005, 1003, 1002],
+                2: [1011, 1012, 1015, 1010, 1014, 1162, 1013],
+                3: [1016, 1020, 1018, 1017, 1019],
+                4: [1022, 1024, 1021, 1023],
+                5: [1025],
+                6: [1028, 1026, 1027],
+                8: [1035, 1041, 1039, 1038, 1036, 1034, 1037, 1040],
+                }
 
 
 def getsoup(url):
@@ -143,13 +153,20 @@ def gettupleline():
 
 
 resultFyle = open("output.csv", 'w')  # Open File
-resultFyle.write("Наименование;Тип тендера;Цена;До;Регион;Отрасль\n")  # Write first row to file
+resultFyle.write("Наименование;Цена;До;Тип тендера;От;Регион;Отрасль\n")  # Write first row to file
 
 
 check_tender_num = tender_days  # for if there is more than 20 tenders on the page we will use everyday cycle
-for type_of_tender in range(1, len(list_of_tenders_type)):
 
-    for industial_otrasl in range(1, len(list_of_otrsl)):
+check_type_of_tender = ""  # check-marker for escape cycle
+type_of_tender = 1
+while type_of_tender <= list_of_tenders_type[-1]:
+#for type_of_tender in range(1, len(list_of_tenders_type)):
+
+    check_industrial_otrasl = ""  # check-marker for escape cycle
+    industial_otrasl = 1
+    while industial_otrasl <= list_of_otrsl[-1]:
+#    for industial_otrasl in range(1, len(list_of_otrsl)):
 
         dais_count = tender_days
         while dais_count > check_tender_num-1:  # for each day in period
@@ -158,6 +175,7 @@ for type_of_tender in range(1, len(list_of_tenders_type)):
             print(dais_count)
             print(check_tender_num)
             print("industial_otrasl-", industial_otrasl)
+            print("type_of_tender-", type_of_tender)
             if check_tender_num == tender_days and  dais_count == tender_days:
                 loaddate = ""
             elif check_tender_num != tender_days and  dais_count == 1:
@@ -178,6 +196,7 @@ for type_of_tender in range(1, len(list_of_tenders_type)):
             print(url)
             num_of_tenders = tenderquantity()  # check quantity of tenders on the page
             if num_of_tenders >20:  # if there is more than 20 tender on the page we go to everyday cycle
+
                 check_tender_num = 1
  #               dais_count = 1
                 continue
@@ -194,5 +213,7 @@ for type_of_tender in range(1, len(list_of_tenders_type)):
                     resultFyle.write(r + ";")  # in cycle write data to file
                 resultFyle.write(";\n")
             dais_count -= 1
+        industial_otrasl += 1
+    type_of_tender += 1
 
 resultFyle.close()  # close File
