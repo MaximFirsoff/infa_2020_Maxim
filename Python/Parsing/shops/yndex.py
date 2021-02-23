@@ -23,6 +23,7 @@ try:
 except FileNotFoundError:  # if no the file
     print("""there must be the file "shop.xls" somewhere""")
 
+mustmodul = 'modulrequest'  # module we will use to get page
 
 def mailsend():
     """
@@ -172,13 +173,11 @@ def modulrequest():
 
 # mailsend()
 
-
-
-
 for i in range(0, len(dfexcel)):  # for each row in Excel file
     ourprice = 0
-    mustmodul = 'modulrequest'  # module we will use to get page
-
+    if mustmodul == 'modulselenium':  # if we used Selenium previously
+        driver.close()
+        mustmodul = 'modulrequest'  # module we will use to get page
 
     while ourprice == 0:  # if cookies is old and function get error we signaling about it and cycle
         cj = browsercookie.firefox()  # get cookies from firefox
@@ -196,18 +195,24 @@ for i in range(0, len(dfexcel)):  # for each row in Excel file
                 print('In ', dfexcel.iloc[i]['URL'], ' \n is price decreased \n was ',
                       dfexcel.iloc[i]['Price'], '\n now ', ourprice)
                 wait = input("Press Enter to continue.")
+                print('Please wait')
 
         # в цикле получим ответ страницы как она нас видит
         # for key, value in req.request.headers.items():
         #     print(key+": "+value)
 
-        except IndexError:  # if get bann
+        except IndexError:  # if got ban
             if mustmodul == 'modulselenium':  # if we do not get the price both modules
                 driver.close()
                 print('The Site blocks Your cookies. You need open Firefox and go by link')
                 print(dfexcel.iloc[i]['URL'])
-                print('Enter the capcha')
+                print('Enter the captcha')
                 wait = input("And press Enter to continue after that.")
+                print('Please wait')
+                temporarycookies =  browsercookie.firefox()  # get cookies from firefox
+                while temporarycookies == cj:  # the cookies do not new in the moment
+                    temporarycookies = browsercookie.firefox()  # get cookies again
+                cj = temporarycookies  # new cookies
                 mustmodul = 'modulrequest'
             else:  # if we do not fet the price Request module we try Selenium module
                 print('Module Request is not working. Trying Selenium module.')
@@ -220,7 +225,5 @@ for i in range(0, len(dfexcel)):  # for each row in Excel file
 
             # print(cj)
 
-try:
+if mustmodul == 'modulselenium':  # if geckodriver.exe is open, close it
     driver.close()
-except:
-    pass
