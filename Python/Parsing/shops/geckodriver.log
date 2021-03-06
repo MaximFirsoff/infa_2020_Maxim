@@ -1246,3 +1246,4 @@ JavaScript warning: https://mc.yandex.ru/metrika/watch.js, line 102: Failed to c
 JavaScript warning: https://mc.yandex.ru/metrika/watch.js, line 102: WebGL warning: <Create>: Can't use WebGL in headless mode (https://bugzil.la/1375585).
 JavaScript warning: https://mc.yandex.ru/metrika/watch.js, line 102: Failed to create WebGL context: WebGL creation failed: 
 * Can't use WebGL in headless mode (https://bugzil.la/1375585).
+1614068388650	Marionette	INFO	Stopped listening on port 51420
