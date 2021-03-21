@@ -55,6 +55,50 @@ for key, group in groupby(s, lambda x: x[0]):
 def tws(a):
     return a**2
 
+def zipanalog(fistlist: list, secondlist: list):
+    """
+    analog zip-function
+    """
+    ziptuple = []
+    minlenth = min(len(fistlist), len(secondlist))
+    fistlist = list(fistlist)
+    secondlist = list(secondlist)
+    for x in range(minlenth):
+        ziptuple.append((fistlist[x], secondlist[x]))
+    return ziptuple
+
+def mapanalog(fisfunction, secondlist: list):
+    """
+    analog map-function
+    """
+    secondlist = list(secondlist)
+    maplist = []
+    for x in secondlist:
+        maplist.append(fisfunction(x))
+    return maplist
+
+def sumtt(a):
+    return a+a
+
+
+def enumanalog(secondlist: list):
+    """
+    analog enumerate-function
+    """
+    secondlist = list(secondlist)
+    enlist = []
+    for x in range(len(secondlist)):
+        enlist.append((x, secondlist[x]))
+    return enlist
+
+print(enumanalog("ffff"))
+
+
+print(mapanalog(sumtt, "ffff"))
+
+
+print(zipanalog("dddd", "ffff"))
+
 a = [8,-11,4,2,-5]
 print(max(a,key=tws))
 
