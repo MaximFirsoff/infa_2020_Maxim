@@ -29,10 +29,10 @@ try:  # check file if no images
     f = open('trusy-emporio-armani-siniy-545498-1.bmp')
     f.close()
 except IOError:
-	r = requests.get('https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/lab3/trusy-emporio-armani-siniy-545498-1.bmp')
+	r = requests.get('https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/Python/MFTI/games/lab3/trusy-emporio-armani-siniy-545498-1.bmp')
 	with open('trusy-emporio-armani-siniy-545498-1.bmp','wb') as f:
   		f.write(r.content)
-	r = requests.get('https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/lab3/trusy2.bmp')
+	r = requests.get('https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/Python/MFTI/games/lab3/trusy2.bmp')
 	with open('trusy2.bmp','wb') as f:
   		f.write(r.content)
 #    urllib.request.urlretrieve("https://github.com/MaximFirsoff/infa_2020_Maxim/raw/main/lab3/trusy-emporio-armani-siniy-545498-1.bmp", "trusy-emporio-armani-siniy-545498-1.bmp")

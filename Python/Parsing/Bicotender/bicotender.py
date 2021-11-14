@@ -94,13 +94,17 @@ def getpriceoftender():
     """
     getting price of the tender for the row of excel
     """
-    price_of_tender = str(tr_list_of_data).split('Цена')
+    price_of_tender = str(tr_list_of_data).split('Начальная цена')
+
+    print(len(price_of_tender))
+
     if len(price_of_tender) > 1:  # if price exists
         price_of_tender = str(price_of_tender[1]).split('>')
-        price_of_tender = re.findall(r'\d+', price_of_tender[1])  # getting number from string
+        price_of_tender = re.findall(r'\d+', price_of_tender[2])  # getting number from string
         price_of_tender = "".join(price_of_tender)
     else:  # if no price
         price_of_tender = "не указано"
+
     return price_of_tender
 
 
